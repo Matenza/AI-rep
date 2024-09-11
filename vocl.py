@@ -1,16 +1,7 @@
 import streamlit as st
 import speech_recognition as sr
-import pyaudio
 
 r = sr.Recognizer()
-
-def is_microphone_available():
-    try:
-        p = pyaudio.PyAudio()
-        if p.get_default_input_device_info():
-            return True
-    except:
-        return False
 
 def transcribe_speech():
     # Lire depuis le microphone
@@ -33,11 +24,6 @@ def transcribe_speech():
 def main():
     st.title("Speech Recognition App")
     st.write("Click on the microphone to start speaking:")
-
-    # Vérifier si le microphone est disponible
-    if not is_microphone_available():
-        st.error("Microphone not available. Please check your microphone or run this locally.")
-        return
 
     # Ajouter un bouton pour déclencher la reconnaissance vocale
     if st.button("Start Recording"):
