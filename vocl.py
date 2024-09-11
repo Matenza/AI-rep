@@ -1,36 +1,47 @@
 import streamlit as st
 import speech_recognition as sr
-from setuptools._distutils.version import LooseVersion
+import pyaudio
+
 r = sr.Recognizer()
 
+def is_microphone_available():
+    try:
+        p = pyaudio.PyAudio()
+        if p.get_default_input_device_info():
+            return True
+    except:
+        return False
+
 def transcribe_speech():
-    # Initialize recognizer class
-    
-    # Reading Microphone as source
+    # Lire depuis le microphone
     with sr.Microphone() as source:
         st.info("Speak now...")
-        r.pause_threshold=0.6
-        # listen for speech and store in audio_text variable
+        r.pause_threshold = 0.6
+        # Écouter et stocker dans la variable audio_text
         audio_text = r.listen(source)
         st.info("Transcribing...")
 
         try:
-            # using Google Speech Recognition
-            text = r.recognize_google(audio_text,language='en-us')
+            # Utilisation de Google Speech Recognition
+            text = r.recognize_google(audio_text, language='en-us')
             return text
-        except:
-            return "Sorry, I did not get that."
-
-
+        except sr.UnknownValueError:
+            return "Sorry, I could not understand the audio."
+        except sr.RequestError:
+            return "Could not request results from Google Speech Recognition service."
 
 def main():
     st.title("Speech Recognition App")
     st.write("Click on the microphone to start speaking:")
 
-    # add a button to trigger speech recognition
+    # Vérifier si le microphone est disponible
+    if not is_microphone_available():
+        st.error("Microphone not available. Please check your microphone or run this locally.")
+        return
+
+    # Ajouter un bouton pour déclencher la reconnaissance vocale
     if st.button("Start Recording"):
         text = transcribe_speech()
         st.write("Transcription: ", text)
 
 main()
-   
