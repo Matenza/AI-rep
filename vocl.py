@@ -4,11 +4,43 @@ import pyaudio
 
 r = sr.Recognizer()
 
-from audio_recorder_streamlit import audio_recorder
+# Session state
+if 'text' not in st.session_state:
+	st.session_state['text'] = 'Listening...'
+	st.session_state['run'] = False
 
-audio_bytes = audio_recorder()
-if audio_bytes:
-    st.audio(audio_bytes, format="audio/wav")
+# Audio parameters 
+st.sidebar.header('Audio Parameters')
+
+FRAMES_PER_BUFFER = int(st.sidebar.text_input('Frames per buffer', 3200))
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = int(st.sidebar.text_input('Rate', 16000))
+p = pyaudio.PyAudio()
+
+# Open an audio stream with above parameter settings
+stream = p.open(
+   format=FORMAT,
+   channels=CHANNELS,
+   rate=RATE,
+   input=True,
+   frames_per_buffer=FRAMES_PER_BUFFER
+)
+
+# Start/stop audio transmission
+def start_listening():
+	st.session_state['run'] = True
+
+def download_transcription():
+	read_txt = open('transcription.txt', 'r')
+	st.download_button(
+		label="Download transcription",
+		data=read_txt,
+		file_name='transcription_output.txt',
+		mime='text/plain')
+
+def stop_listening():
+	st.session_state['run'] = False
 
 def is_microphone_available():
     try:
