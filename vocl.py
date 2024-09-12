@@ -4,6 +4,12 @@ import pyaudio
 
 r = sr.Recognizer()
 
+from audio_recorder_streamlit import audio_recorder
+
+audio_bytes = audio_recorder()
+if audio_bytes:
+    st.audio(audio_bytes, format="audio/wav")
+
 def is_microphone_available():
     try:
         p = pyaudio.PyAudio()
